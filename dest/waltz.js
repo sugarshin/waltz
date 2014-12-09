@@ -1,19 +1,19 @@
 /*!
- * @license waltz v0.0.1
+ * @license Waltz v0.0.2
  * (c) 2014 sugarshin https://github.com/sugarshin
  * License: MIT
  */
 (function() {
-  var Circle, Utility, Waltz, ns,
+  var Circle, Util, Waltz, ns,
     __hasProp = {}.hasOwnProperty,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
   ns = window;
 
-  Utility = (function() {
-    function Utility() {}
+  Util = (function() {
+    function Util() {}
 
-    Utility.prototype.wait = function(_this, time) {
+    Util.prototype.wait = function(_this, time) {
       return $.Deferred(function(defer) {
         return setTimeout(function() {
           return defer.resolve(_this);
@@ -21,15 +21,15 @@
       }).promise();
     };
 
-    Utility.prototype.addEvent = function(el, type, eventHandler) {
+    Util.prototype.addEvent = function(el, type, eventHandler) {
       return el.addEventListener(type, eventHandler);
     };
 
-    Utility.prototype.rmEvent = function(el, type, eventHandler) {
+    Util.prototype.rmEvent = function(el, type, eventHandler) {
       return el.removeEventListener(type, eventHandler);
     };
 
-    Utility.prototype.extend = function(out) {
+    Util.prototype.extend = function(out) {
       var i, key, val, _i, _ref, _ref1;
       out || (out = {});
       for (i = _i = 1, _ref = arguments.length; 1 <= _ref ? _i < _ref : _i > _ref; i = 1 <= _ref ? ++_i : --_i) {
@@ -46,15 +46,15 @@
       return out;
     };
 
-    Utility.prototype.getRandomInt = function(min, max) {
+    Util.prototype.getRandomInt = function(min, max) {
       return Math.floor(Math.random() * (max - min + 1)) + min;
     };
 
-    Utility.prototype.remove = function(el) {
+    Util.prototype.remove = function(el) {
       return el.parentNode.removeChild(el);
     };
 
-    return Utility;
+    return Util;
 
   })();
 
@@ -74,7 +74,7 @@
     }
 
     Circle.prototype.util = (function() {
-      return new Utility;
+      return new Util;
     })();
 
     Circle.prototype.render = function() {
@@ -128,7 +128,7 @@
     }
 
     Waltz.prototype.util = (function() {
-      return new Utility;
+      return new Util;
     })();
 
     Waltz.prototype.setField = function() {
@@ -139,26 +139,33 @@
       return this;
     };
 
+    Waltz.prototype.anime = function() {
+      var circle, i, _i, _len, _ref;
+      this.ctx.clearRect(0, 0, this.width, this.height);
+      _ref = this.circles;
+      for (i = _i = 0, _len = _ref.length; _i < _len; i = ++_i) {
+        circle = _ref[i];
+        if ((circle != null ? circle.options.frame : void 0) >= (circle != null ? circle.options.max : void 0)) {
+          this.circles.splice(i, 1);
+        } else {
+          if (circle != null) {
+            circle.render().progress();
+          }
+        }
+      }
+      return this;
+    };
+
     Waltz.prototype.start = function() {
       var frame, start;
       start = new Date().getTime();
       (frame = (function(_this) {
         return function() {
-          var circle, i, last, _i, _len, _ref;
+          var last;
           _this._timerID = _requestAnimeFrame(frame);
           last = new Date().getTime();
           if (last - start >= 100 - _this.options.fps && (_this.circles != null)) {
-            _this.ctx.clearRect(0, 0, _this.width, _this.height);
-            _ref = _this.circles;
-            for (i = _i = 0, _len = _ref.length; _i < _len; i = ++_i) {
-              circle = _ref[i];
-              if (circle != null) {
-                circle.render().progress();
-              }
-              if ((circle != null ? circle.options.frame : void 0) >= (circle != null ? circle.options.max : void 0)) {
-                _this.circles.splice(i, 1);
-              }
-            }
+            _this.anime();
             return start = new Date().getTime();
           }
         };

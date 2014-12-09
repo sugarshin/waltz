@@ -1,6 +1,6 @@
 ns = window
 
-class Utility
+class Util
   wait: (_this, time) ->
     return $.Deferred((defer) ->
       setTimeout ->
@@ -40,7 +40,7 @@ class Circle
     @options = @util.extend {}, @defaults, options
     @ctx = ctx
 
-  util: do -> new Utility
+  util: do -> new Util
 
   render: ->
     @ctx.beginPath()
@@ -92,7 +92,7 @@ class Waltz
     @setField()
     @events()
 
-  util: do -> new Utility
+  util: do -> new Util
 
   setField: ->
     @width = window.innerWidth
@@ -105,6 +105,15 @@ class Waltz
     # "
     return this
 
+  anime: ->
+    @ctx.clearRect 0, 0, @width, @height
+    for circle, i in @circles
+      if circle?.options.frame >= circle?.options.max
+        @circles.splice i, 1
+      else
+        circle?.render().progress()
+    return this
+
   start: ->
     start = new Date().getTime()
     do frame = =>
@@ -112,11 +121,7 @@ class Waltz
       last = new Date().getTime()
       if last - start >= 100 - @options.fps and
       @circles?
-        @ctx.clearRect 0, 0, @width, @height
-        for circle, i in @circles
-          circle?.render().progress()
-          if circle?.options.frame >= circle?.options.max
-            @circles.splice i, 1
+        @anime()
         start = new Date().getTime()
     return this
 
