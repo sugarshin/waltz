@@ -1,13 +1,6 @@
 ns = window
 
 class Util
-  wait: (_this, time) ->
-    return $.Deferred((defer) ->
-      setTimeout ->
-        defer.resolve(_this)
-      , time
-    ).promise()
-
   addEvent: (el, type, eventHandler) -> el.addEventListener type, eventHandler
 
   rmEvent: (el, type, eventHandler) -> el.removeEventListener type, eventHandler
@@ -23,7 +16,28 @@ class Util
   getRandomInt: (min, max) ->
     return Math.floor(Math.random() * (max - min + 1)) + min
 
-  remove: (el) -> el.parentNode.removeChild el
+  filter: do ->
+    if Array.filter
+      return Array.filter
+    else
+      # https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/Array/filter
+      return (fun) ->
+        'use strict'
+        unless @? then throw new TypeError()
+        t = Object @
+        len = t.length >>> 0
+        unless typeof fun is 'function'
+          throw new TypeError()
+        res = []
+        thisp = arguments[1]
+        i = 0
+        while i < len
+          if i of t
+            val = t[i]
+            if fun.call thisp, val, i, t
+              res.push val
+          i++
+        return res
 
 
 
@@ -62,22 +76,22 @@ class Circle
 class Waltz
   _requestAnimeFrame = do ->
     return (
-      window.requestAnimationFrame ||
-      window.webkitRequestAnimationFrame ||
-      window.mozRequestAnimationFrame ||
-      window.msRequestAnimationFrame ||
-      window.oRequestAnimationFrame ||
+      window.requestAnimationFrame or
+      window.webkitRequestAnimationFrame or
+      window.mozRequestAnimationFrame or
+      window.msRequestAnimationFrame or
+      window.oRequestAnimationFrame or
       (callback) ->
         return window.setTimeout callback, 1000 / 60
     )
 
   _cancelAnimeFrame = do ->
     return (
-      window.cancelAnimationFrame ||
-      window.webkitCancelAnimationFrame ||
-      window.mozCancelAnimationFrame ||
-      window.msCancelAnimationFrame ||
-      window.oCancelAnimationFrame ||
+      window.cancelAnimationFrame or
+      window.webkitCancelAnimationFrame or
+      window.mozCancelAnimationFrame or
+      window.msCancelAnimationFrame or
+      window.oCancelAnimationFrame or
       (id) ->
         return window.clearTimeout id
     )
@@ -108,10 +122,12 @@ class Waltz
   anime: ->
     @ctx.clearRect 0, 0, @width, @height
     for circle, i in @circles
-      if circle?.options.frame >= circle?.options.max
-        @circles.splice i, 1
+      if circle.options.frame >= circle.options.max
+        circle = null
       else
-        circle?.render().progress()
+        circle.render().progress()
+
+    @util.filter.call @circles, (i) -> i
     return this
 
   start: ->

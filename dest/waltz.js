@@ -1,5 +1,5 @@
 /*!
- * @license Waltz v0.0.2
+ * @license Waltz v0.1.0
  * (c) 2014 sugarshin https://github.com/sugarshin
  * License: MIT
  */
@@ -12,14 +12,6 @@
 
   Util = (function() {
     function Util() {}
-
-    Util.prototype.wait = function(_this, time) {
-      return $.Deferred(function(defer) {
-        return setTimeout(function() {
-          return defer.resolve(_this);
-        }, time);
-      }).promise();
-    };
 
     Util.prototype.addEvent = function(el, type, eventHandler) {
       return el.addEventListener(type, eventHandler);
@@ -50,9 +42,37 @@
       return Math.floor(Math.random() * (max - min + 1)) + min;
     };
 
-    Util.prototype.remove = function(el) {
-      return el.parentNode.removeChild(el);
-    };
+    Util.prototype.filter = (function() {
+      if (Array.filter) {
+        return Array.filter;
+      } else {
+        return function(fun) {
+          'use strict';
+          var i, len, res, t, thisp, val;
+          if (typeof this === "undefined" || this === null) {
+            throw new TypeError();
+          }
+          t = Object(this);
+          len = t.length >>> 0;
+          if (typeof fun !== 'function') {
+            throw new TypeError();
+          }
+          res = [];
+          thisp = arguments[1];
+          i = 0;
+          while (i < len) {
+            if (i in t) {
+              val = t[i];
+              if (fun.call(thisp, val, i, t)) {
+                res.push(val);
+              }
+            }
+            i++;
+          }
+          return res;
+        };
+      }
+    })();
 
     return Util;
 
@@ -145,14 +165,15 @@
       _ref = this.circles;
       for (i = _i = 0, _len = _ref.length; _i < _len; i = ++_i) {
         circle = _ref[i];
-        if ((circle != null ? circle.options.frame : void 0) >= (circle != null ? circle.options.max : void 0)) {
-          this.circles.splice(i, 1);
+        if (circle.options.frame >= circle.options.max) {
+          circle = null;
         } else {
-          if (circle != null) {
-            circle.render().progress();
-          }
+          circle.render().progress();
         }
       }
+      this.util.filter.call(this.circles, function(i) {
+        return i;
+      });
       return this;
     };
 
