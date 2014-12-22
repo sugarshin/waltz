@@ -1,8 +1,6 @@
 gulp = require 'gulp'
-plumber = require 'gulp-plumber'
-coffee = require 'gulp-coffee'
-coffeelint = require 'gulp-coffeelint'
-notify = require 'gulp-notify'
+browserify = require 'browserify'
+source = require 'vinyl-source-stream'
 header = require 'gulp-header'
 uglify = require 'gulp-uglify'
 rename = require 'gulp-rename'
@@ -19,17 +17,19 @@ banner = """
 
 """
 
-fileName = 'waltz'
+MAIN_FILE_NAME = 'main'
+DEST_FILE_NAME = 'waltz'
+DEST = 'dest'
 
-gulp.task 'coffee', ->
-  gulp.src "src/#{fileName}.coffee"
-    .pipe plumber
-      errorHandler: notify.onError '<%= error.message %>'
+gulp.task 'browserify', ->
+  browserify
+    entries: ["./src/#{MAIN_FILE_NAME}.coffee"]
+    extensions: ['.coffee', 'js']
+  .bundle()
+  .pipe source "#{DEST_FILE_NAME}.js"
+  .pipe header(banner)
+  .pipe gulp.dest("#{DEST}")
 
-    .pipe coffeelint()
-    .pipe coffee()
-    .pipe header(banner)
-    .pipe gulp.dest('dest/')
 
 gulp.task 'serve', ->
   browserSync
@@ -38,7 +38,7 @@ gulp.task 'serve', ->
       index: 'demo/index.html'
 
 gulp.task 'default', ['serve'], ->
-  gulp.watch ["src/#{fileName}.coffee"], ['coffee', browserSync.reload]
+  gulp.watch ["src/*.coffee"], ['browserify', browserSync.reload]
 
 gulp.task 'major', ->
   gulp.src './*.json'
@@ -61,10 +61,10 @@ gulp.task 'patch', ->
     )
     .pipe gulp.dest('./')
 
-gulp.task 'build', ['coffee'], ->
-  gulp.src "dest/#{fileName}.js"
+gulp.task 'build', ['browserify'], ->
+  gulp.src "#{DEST}/#{DEST_FILE_NAME}.js"
     .pipe uglify
       preserveComments: 'some'
     .pipe rename
       extname: '.min.js'
-    .pipe gulp.dest('dest/')
+    .pipe gulp.dest("#{DEST}")
