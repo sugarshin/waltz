@@ -1,5 +1,5 @@
 /*!
- * @license Waltz v1.0.0
+ * @license Waltz v1.0.1
  * (c) 2014 sugarshin https://github.com/sugarshin
  * License: MIT
  */
@@ -8,9 +8,9 @@ var Waltz, waltz;
 
 Waltz = require('./Waltz');
 
-waltz = new Waltz(document.querySelector('#waltz', {
+waltz = new Waltz(document.querySelector('#waltz'), {
   fps: 60
-}));
+});
 
 waltz.start();
 
