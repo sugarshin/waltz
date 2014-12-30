@@ -10,7 +10,7 @@
                                               
 ```
 
-[https://sugarshin.github.io/waltz/demo/](https://sugarshin.github.io/waltz/demo/)
+[https://sugarshin.github.io/waltz/](//sugarshin.github.io/waltz/)
 
 ## Contributing
 

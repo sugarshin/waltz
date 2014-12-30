@@ -4,9 +4,11 @@ source = require 'vinyl-source-stream'
 header = require 'gulp-header'
 uglify = require 'gulp-uglify'
 rename = require 'gulp-rename'
-bump = require 'gulp-bump'
+requireDir = require 'require-dir'
 browserSync = require 'browser-sync'
 pkg = require './package.json'
+
+requireDir './tasks'
 
 reload = browserSync.reload
 
@@ -46,27 +48,6 @@ gulp.task 'serve', ->
 
 gulp.task 'default', ['serve'], ->
   gulp.watch ['src/*.coffee'], ['browserify', reload]
-
-gulp.task 'major', ->
-  gulp.src './*.json'
-    .pipe bump(
-      type: 'major'
-    )
-    .pipe gulp.dest('./')
-
-gulp.task 'minor', ->
-  gulp.src './*.json'
-    .pipe bump(
-      type: 'minor'
-    )
-    .pipe gulp.dest('./')
-
-gulp.task 'patch', ->
-  gulp.src './*.json'
-    .pipe bump(
-      type: 'patch'
-    )
-    .pipe gulp.dest('./')
 
 gulp.task 'build', ['browserify'], ->
   gulp.src "#{DEST}/#{DEST_FILE_NAME}.js"
