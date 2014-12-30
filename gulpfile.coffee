@@ -8,6 +8,8 @@ bump = require 'gulp-bump'
 browserSync = require 'browser-sync'
 pkg = require './package.json'
 
+reload = browserSync.reload
+
 banner = """
 /*!
  * @license #{pkg.name} v#{pkg.version}
@@ -20,6 +22,7 @@ banner = """
 MAIN_FILE_NAME = 'main'
 DEST_FILE_NAME = 'waltz'
 DEST = 'dest'
+DEMO = 'demo'
 
 gulp.task 'browserify', ->
   browserify
@@ -29,16 +32,20 @@ gulp.task 'browserify', ->
   .pipe source "#{DEST_FILE_NAME}.js"
   .pipe header(banner)
   .pipe gulp.dest("#{DEST}")
+  .pipe gulp.dest("#{DEMO}")
 
 
 gulp.task 'serve', ->
   browserSync
+    startPath: '/'
     server:
       baseDir: './'
-      index: 'demo/index.html'
+      index: 'demo/'
+      routes:
+        '/': 'demo/'
 
 gulp.task 'default', ['serve'], ->
-  gulp.watch ["src/*.coffee"], ['browserify', browserSync.reload]
+  gulp.watch ['src/*.coffee'], ['browserify', reload]
 
 gulp.task 'major', ->
   gulp.src './*.json'

@@ -5,24 +5,24 @@ module.exports =
   class Waltz
     _requestAnimeFrame = do ->
       return (
-        window.requestAnimationFrame or
-        window.webkitRequestAnimationFrame or
-        window.mozRequestAnimationFrame or
-        window.msRequestAnimationFrame or
-        window.oRequestAnimationFrame or
+        requestAnimationFrame or
+        webkitRequestAnimationFrame or
+        mozRequestAnimationFrame or
+        msRequestAnimationFrame or
+        oRequestAnimationFrame or
         (callback) ->
-          return window.setTimeout callback, 1000 / 60
+          setTimeout callback, 1000 / 60
       )
 
     _cancelAnimeFrame = do ->
       return (
-        window.cancelAnimationFrame or
-        window.webkitCancelAnimationFrame or
-        window.mozCancelAnimationFrame or
-        window.msCancelAnimationFrame or
-        window.oCancelAnimationFrame or
+        cancelAnimationFrame or
+        webkitCancelAnimationFrame or
+        mozCancelAnimationFrame or
+        msCancelAnimationFrame or
+        oCancelAnimationFrame or
         (id) ->
-          return window.clearTimeout id
+          clearTimeout id
       )
 
     defaults:
@@ -64,7 +64,7 @@ module.exports =
       do frame = =>
         @_timerID = _requestAnimeFrame frame
         last = new Date().getTime()
-        if last - start >= 100 - @options.fps and
+        if last - start >= 100 - (100 - @options.fps) and
         @circles?
           @anime()
           start = new Date().getTime()
@@ -97,9 +97,9 @@ module.exports =
       @util.addEvent window, 'resize', => @setField()
       @util.addEvent window, 'orientationchange', => @setField()
 
-      @util.addEvent window, 'mousemove', @add
-      # @util.addEvent window, 'mouseleave', => @stop()
-      @util.addEvent window, 'touchstart', @add
-      @util.addEvent window, 'touchmove', @add
-      # @util.addEvent window, 'touchend', => @stop()
+      @util.addEvent @canvas, 'mousemove', @add
+      # @util.addEvent @canvas, 'mouseleave', => @stop()
+      @util.addEvent @canvas, 'touchstart', @add
+      @util.addEvent @canvas, 'touchmove', @add
+      # @util.addEvent @canvas, 'touchend', => @stop()
       return this
