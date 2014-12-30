@@ -1,5 +1,5 @@
 /*!
- * @license Waltz v1.0.1
+ * @license Waltz v1.0.2
  * (c) 2014 sugarshin https://github.com/sugarshin
  * License: MIT
  */
